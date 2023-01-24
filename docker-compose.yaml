@@ -1,0 +1,77 @@
+---
+volumes:
+  log:
+  srv:
+
+services:
+  build:
+    build:
+      context: .
+      dockerfile: build.Dockerfile
+    image: kanachan-reviewer-build
+    volumes:
+      - type: volume
+        source: log
+        target: /var/log/kanachan-reviewer
+      - type: volume
+        source: srv
+        target: /srv/kanachan-reviewer
+  redis:
+    image: redis
+    ports:
+      - target: 6379
+        published: 6379
+        protocol: tcp
+        mode: host
+  fetcher:
+    build:
+      context: .
+      dockerfile: fetcher.Dockerfile
+    image: kanachan-reviewer-fetcher
+    volumes:
+      - type: volume
+        source: log
+        target: /var/log/kanachan-reviewer
+      - type: bind
+        source: "${DOT_AWS_DIR}"
+        target: /home/ubuntu/.aws
+        read_only: true
+    environment:
+      - AWS_PROFILE
+    depends_on:
+      - build
+      - redis
+  analyzer:
+    build:
+      context: .
+      dockerfile: analyzer.Dockerfile
+    image: kanachan-reviewer-analyzer
+    volumes:
+      - type: volume
+        source: log
+        target: /var/log/kanachan-reviewer
+    depends_on:
+      - build
+      - redis
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend.Dockerfile
+    image: kanachan-reviewer-frontend
+    volumes:
+      - type: volume
+        source: log
+        target: /var/log/kanachan-reviewer
+      - type: volume
+        source: srv
+        target: /srv/kanachan-reviewer
+    ports:
+      - target: 5000
+        published: 5000
+        protocol: tcp
+        mode: host
+    expose:
+      - 5000
+    depends_on:
+      - build
+      - redis

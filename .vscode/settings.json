@@ -1,0 +1,17 @@
+{
+    "terminal.integrated.env.windows": {
+        "FLASK_APP": "kanachan_reviewer.app"
+    },
+    "files.exclude": {
+        "kanachan_reviewer/mahjongsoul_pb2.py": true,
+        "kanachan_reviewer/mahjongsoul_pb2.pyi": true,
+        "build": true,
+        "kanachan_reviewer.egg-info": true,
+        "**/__pycache__": true
+    },
+    "python.analysis.typeCheckingMode": "strict",
+    "python.analysis.extraPaths": [
+        "/home/vscode/.local/lib/python3.10/site-packages"
+    ],
+    "python.linting.pylintEnabled": true
+}
